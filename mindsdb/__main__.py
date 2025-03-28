@@ -6,6 +6,7 @@ logger.debug("Starting MindsDB...")
 import os
 import sys
 import time
+import type_infer
 import json
 import atexit
 import signal
@@ -110,6 +111,7 @@ if __name__ == '__main__':
         exit(1)
 
     # --- VERSION MODE ----
+    logger.debug(f"Using type_infer version: {type_infer.__version__}")
     if args is not None and args.version:
         print(f'MindsDB {mindsdb_version}')
         sys.exit(0)
