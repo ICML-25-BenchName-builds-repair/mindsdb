@@ -36,10 +36,11 @@ MAIN_EXCLUDE_PATHS = ["mindsdb/integrations/handlers/.*_handler", "pryproject.to
 # torch.multiprocessing is imported in a 'try'. Falls back to multiprocessing so we dont NEED it.
 # Psycopg2 is needed in core codebase for sqlalchemy.
 # hierarchicalforecast is an optional dep of neural/statsforecast
+# distutils is a standard library module in Python, so it doesn't need to be listed in requirements.txt
 MAIN_RULE_IGNORES = {
     "DEP003": ["torch"],
     # Ignore Langhchain since the requirements check will still fail even if it's conditionally imported for certain features.
-    "DEP001": ["torch"],
+    "DEP001": ["torch", "distutils"],
     "DEP002": ["psycopg2-binary"],
 }
 
