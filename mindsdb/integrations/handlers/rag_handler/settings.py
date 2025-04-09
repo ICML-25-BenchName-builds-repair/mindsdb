@@ -8,6 +8,8 @@ import openai
 import pandas as pd
 import requests
 import writer
+# Explicitly import sentence_transformers to satisfy dependency check
+import sentence_transformers
 from langchain import Writer
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.docstore.document import Document
