@@ -113,6 +113,7 @@ PACKAGE_NAME_MAP = {
     "clickhouse-sqlalchemy": ["clickhouse_sqlalchemy"],
     "pillow": ["PIL"],
     "auto-ts": ["auto_ts"],
+    "setuptools": ["distutils"],
 }
 
 # We use this to exit with a non-zero status code if any check fails
