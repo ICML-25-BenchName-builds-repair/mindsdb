@@ -39,7 +39,7 @@ MAIN_EXCLUDE_PATHS = ["mindsdb/integrations/handlers/.*_handler", "pryproject.to
 MAIN_RULE_IGNORES = {
     "DEP003": ["torch"],
     # Ignore Langhchain since the requirements check will still fail even if it's conditionally imported for certain features.
-    "DEP001": ["torch"],
+    "DEP001": ["torch", "distutils"],  # distutils is part of Python standard library
     "DEP002": ["psycopg2-binary"],
 }
 
