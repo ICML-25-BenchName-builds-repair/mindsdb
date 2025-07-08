@@ -5,7 +5,7 @@ import secrets
 import threading
 import traceback
 import webbrowser
-from distutils.version import LooseVersion
+from packaging.version import Version as LooseVersion
 from pathlib import Path
 
 import requests
