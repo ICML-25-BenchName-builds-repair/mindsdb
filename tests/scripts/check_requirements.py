@@ -140,22 +140,36 @@ def run_deptry(reqs, rule_ignores, path, extra_args=""):
     """Run a dependency check with deptry. Return a list of error messages"""
 
     errors = []
+
+    # Create a temporary requirements file with absolute paths
+    temp_reqs_path = os.path.abspath("temp_reqs.txt")
+    with open(temp_reqs_path, "w") as temp_f:
+        for req_file in reqs.split(','):
+            with open(req_file, "r") as f:
+                for line in f.readlines():
+                    if line.startswith("-r ../"):
+                        line = f'-r {os.path.abspath(os.path.join(os.path.dirname(req_file), line.split(' ')[1]))}\n'
+                    temp_f.write(line)
+
     try:
         result = subprocess.run(
-            f"deptry -o deptry.json --no-ansi --known-first-party mindsdb --requirements-txt \"{reqs}\" --per-rule-ignores \"{rule_ignores}\" --package-module-name-map \"{get_ignores_str(PACKAGE_NAME_MAP)}\" {extra_args} {path}",
+            f"deptry -o deptry.json --no-ansi --known-first-party mindsdb --requirements-files {temp_reqs_path} --per-rule-ignores \"{rule_ignores}\" --package-module-name-map \"{get_ignores_str(PACKAGE_NAME_MAP)}\" {extra_args} {path}",
             shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE
         )
         if result.returncode != 0 and not os.path.exists("deptry.json"):
             # There was some issue with running deptry
             errors.append(f"Error running deptry: {result.stderr.decode('utf-8')}")
 
-        with open("deptry.json", "r") as f:
-            deptry_results = json.loads(f.read())
-        for r in deptry_results:
-            errors.append(f"{r['location']['line']}:{r['location']['column']}: {r['error']['code']} {r['error']['message']}")
+        if os.path.exists("deptry.json"):
+            with open("deptry.json", "r") as f:
+                deptry_results = json.loads(f.read())
+            for r in deptry_results:
+                errors.append(f"{r['location']['line']}:{r['location']['column']}: {r['error']['code']} {r['error']['message']}")
     finally:
         if os.path.exists("deptry.json"):
             os.remove("deptry.json")
+        if os.path.exists(temp_reqs_path):
+            os.remove(temp_reqs_path)
     return errors
 
 
