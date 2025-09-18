@@ -73,12 +73,14 @@ def update_static(gui_version_lv):
     config = Config()
     static_path = Path(config["paths"]["static"])
 
+    version_str = getattr(gui_version_lv, 'public', getattr(gui_version_lv, 'vstring', str(gui_version_lv)))
+
     logger.info(
-        f"New version of GUI available ({gui_version_lv.vstring}). Downloading..."
+        f"New version of GUI available ({version_str}). Downloading..."
     )
 
     temp_dir = tempfile.mkdtemp(prefix="mindsdb_gui_files_")
-    success = download_gui(temp_dir, gui_version_lv.vstring)
+    success = download_gui(temp_dir, version_str)
     if success is False:
         shutil.rmtree(temp_dir)
         return False
@@ -90,5 +92,5 @@ def update_static(gui_version_lv):
     shutil.copytree(temp_dir, str(static_path))
     shutil.rmtree(temp_dir_for_rm)
 
-    logger.info(f"GUI version updated to {gui_version_lv.vstring}")
+    logger.info(f"GUI version updated to {version_str}")
     return True
