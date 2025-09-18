@@ -1,1 +1,2 @@
 auto-sklearn
+type_infer
