@@ -5,7 +5,7 @@ import secrets
 import threading
 import traceback
 import webbrowser
-from distutils.version import LooseVersion
+from packaging.version import Version
 from pathlib import Path
 
 import requests
@@ -65,7 +65,7 @@ def custom_output_json(data, code, headers=None):
     return resp
 
 
-def get_last_compatible_gui_version() -> LooseVersion:
+def get_last_compatible_gui_version() -> Version:
     logger.debug("Getting last compatible frontend..")
     try:
         res = requests.get('https://mindsdb-web-builds.s3.amazonaws.com/compatible-config.json', timeout=5)
@@ -88,7 +88,7 @@ def get_last_compatible_gui_version() -> LooseVersion:
         logger.error(f"Cant decode compatible-config.json: {e}")
         return False
 
-    current_mindsdb_lv = LooseVersion(mindsdb_version)
+    current_mindsdb_lv = Version(mindsdb_version)
 
     try:
         gui_versions = {}
@@ -96,10 +96,10 @@ def get_last_compatible_gui_version() -> LooseVersion:
         max_gui_lv = None
         for el in versions['mindsdb']:
             if el['mindsdb_version'] is None:
-                gui_lv = LooseVersion(el['gui_version'])
+                gui_lv = Version(el['gui_version'])
             else:
-                mindsdb_lv = LooseVersion(el['mindsdb_version'])
-                gui_lv = LooseVersion(el['gui_version'])
+                mindsdb_lv = Version(el['mindsdb_version'])
+                gui_lv = Version(el['gui_version'])
                 if mindsdb_lv.vstring not in gui_versions or gui_lv > gui_versions[mindsdb_lv.vstring]:
                     gui_versions[mindsdb_lv.vstring] = gui_lv
                 if max_mindsdb_lv is None or max_mindsdb_lv < mindsdb_lv:
@@ -107,7 +107,7 @@ def get_last_compatible_gui_version() -> LooseVersion:
             if max_gui_lv is None or max_gui_lv < gui_lv:
                 max_gui_lv = gui_lv
 
-        all_mindsdb_lv = [LooseVersion(x) for x in gui_versions.keys()]
+        all_mindsdb_lv = [Version(x) for x in gui_versions.keys()]
         all_mindsdb_lv.sort()
 
         if current_mindsdb_lv.vstring in gui_versions:
@@ -115,11 +115,11 @@ def get_last_compatible_gui_version() -> LooseVersion:
         elif current_mindsdb_lv > all_mindsdb_lv[-1]:
             gui_version_lv = max_gui_lv
         else:
-            lower_versions = {key: value for key, value in gui_versions.items() if LooseVersion(key) < current_mindsdb_lv}
+            lower_versions = {key: value for key, value in gui_versions.items() if Version(key) < current_mindsdb_lv}
             if len(lower_versions) == 0:
                 gui_version_lv = gui_versions[all_mindsdb_lv[0].vstring]
             else:
-                all_lower_versions = [LooseVersion(x) for x in lower_versions.keys()]
+                all_lower_versions = [Version(x) for x in lower_versions.keys()]
                 gui_version_lv = gui_versions[all_lower_versions[-1].vstring]
     except Exception as e:
         logger.error(f"Error in compatible-config.json structure: {e}")
@@ -129,7 +129,7 @@ def get_last_compatible_gui_version() -> LooseVersion:
     return gui_version_lv
 
 
-def get_current_gui_version() -> LooseVersion:
+def get_current_gui_version() -> Version:
     logger.debug("Getting current frontend version..")
     config = Config()
     static_path = Path(config['paths']['static'])
@@ -141,7 +141,7 @@ def get_current_gui_version() -> LooseVersion:
             current_gui_version = f.readline()
 
     current_gui_lv = (
-        None if current_gui_version is None else LooseVersion(current_gui_version)
+        None if current_gui_version is None else Version(current_gui_version)
     )
     logger.debug(f"Current frontend version: {current_gui_lv}.")
 
@@ -156,7 +156,7 @@ def initialize_static():
     required_gui_version = config['gui'].get('version')
 
     if required_gui_version is not None:
-        required_gui_version_lv = LooseVersion(required_gui_version)
+        required_gui_version_lv = Version(required_gui_version)
         success = True
         if (
             current_gui_version_lv is None
