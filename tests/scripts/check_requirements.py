@@ -36,11 +36,12 @@ MAIN_EXCLUDE_PATHS = ["mindsdb/integrations/handlers/.*_handler", "pryproject.to
 # torch.multiprocessing is imported in a 'try'. Falls back to multiprocessing so we dont NEED it.
 # Psycopg2 is needed in core codebase for sqlalchemy.
 # hierarchicalforecast is an optional dep of neural/statsforecast
+# type_infer is used in handler files which are excluded from main requirements check
 MAIN_RULE_IGNORES = {
     "DEP003": ["torch"],
     # Ignore Langhchain since the requirements check will still fail even if it's conditionally imported for certain features.
     "DEP001": ["torch"],
-    "DEP002": ["psycopg2-binary"],
+    "DEP002": ["psycopg2-binary", "type_infer"],
 }
 
 # THe following packages need exceptions because they are optional deps of some other packages. e.g. langchain CAN use openai
